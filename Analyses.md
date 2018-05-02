@@ -66,7 +66,7 @@ par
 ```
 
     ##         alpha          beta         gamma         sigma          lp__ 
-    ##  1.355468e-01  4.633938e+01  9.459061e+00  9.974825e+00 -4.636410e+04
+    ##  1.357356e-01  4.628608e+01  9.454549e+00  9.964080e+00 -4.636418e+04
 
 ``` r
 # plotting predictions
@@ -76,10 +76,49 @@ ggplot(data, aes(Rg, NEE)) + geom_point() + geom_smooth() +
 
     ## `geom_smooth()` using method = 'gam'
 
-![](Analyses_files/figure-markdown_github/basic%20plot-3.png)
+![](Analyses_files/figure-markdown_github/basic%20plot-3.png) The basic model fits well the data. no convergence problems. Good estimates of model parameters. No chain covariance.
 
 Testing for a site effect on model parameters
 =============================================
+
+We first test on all parameters simultaneously. Let's see.
+
+``` r
+library(rstan)
+load(file="mod1.Rdata")
+traceplot(mod1, pars=c("alpha", "beta", "gamma", "sigma"), nrow=2)
+```
+
+![](Analyses_files/figure-markdown_github/all%20plot-1.png)
+
+``` r
+plot(mod1)
+```
+
+    ## ci_level: 0.8 (80% intervals)
+
+    ## outer_level: 0.95 (95% intervals)
+
+![](Analyses_files/figure-markdown_github/all%20plot-2.png)
+
+``` r
+# Model parameters
+par<-summary(mod1)$summary[,1]
+par
+```
+
+    ##      alpha[1]      alpha[2]       beta[1]       beta[2]      gamma[1] 
+    ##  1.111553e-01  1.617042e-01  4.666792e+01  4.669262e+01  9.636282e+00 
+    ##      gamma[2]         sigma          lp__ 
+    ##  8.987885e+00  9.855074e+00 -4.606304e+04
+
+From this model, it looks like
+
+**alphas are different, with a lower canopy light utilisation efficiency (0.10-0.12) at Guyaflux than at Nouraflux (0.15-0.17)**
+
+**betas are not different, with the maximum NEE of the canopy at light saturation similar between the two sites (45-49)**
+
+**gammas are slightly different, with the average ecosystem respiration lower at Guyaflux (9.3-10.0) than at Nouraflux (8.6-9.4)**
 
 Predictions
 ===========
