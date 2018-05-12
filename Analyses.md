@@ -17,7 +17,9 @@ Loading Data
 ``` r
 library(ggplot2) 
 data<-read.table(file="data.txt", header = TRUE, sep = "", dec = ".") 
-ggplot(data, aes(Rg, NEE)) + geom_point() + geom_smooth() + facet_wrap(~site) 
+datDAY<-dat[dat$Rg>5,]
+## keeping only daytime values (Rg>5) for the analysis
+ggplot(datDAY, aes(Rg, NEE)) + geom_point() + geom_smooth() + facet_wrap(~site) 
 ```
 
     ## `geom_smooth()` using method = 'gam'
@@ -42,83 +44,38 @@ library(rstan)
     ## To avoid recompilation of unchanged Stan programs, we recommend calling
     ## rstan_options(auto_write = TRUE)
 
-``` r
-load(file="mod0.Rdata")
-traceplot(mod0, pars=c("alpha", "beta", "gamma", "sigma"), nrow=2)
-```
 
-![](Analyses_files/figure-markdown_github/basic%20plot-1.png)
+# Running stan analysis with only daytime values
+datStan<-list(N=11825, T=2, NEE=datDAY$NEE, Rg=datDAY$Rg, site=as.numeric(datDAY$site))
 
-``` r
-plot(mod0)
-```
+fitM0 <- stan(file = 'mich0.stan', data = datStan, iter = 1000, chains = 1)
 
-    ## ci_level: 0.8 (80% intervals)
+fitM1 <- stan(file = 'mich1.stan', data = datStan, iter = 1000, chains = 1)
 
-    ## outer_level: 0.95 (95% intervals)
+traceplot(fitM0, pars=c("alpha", "beta", "gamma", "sigma"), nrow=2)
 
-![](Analyses_files/figure-markdown_github/basic%20plot-2.png)
+traceplot(fitM1, pars=c("alpha", "beta", "gamma", "sigma"), nrow=2)
 
-``` r
-# Model parameters
-par<-summary(mod0)$summary[,1]
-par
-```
+parM1<-summary(fitM1)$summary[,1]
+parM1
 
-    ##         alpha          beta         gamma         sigma          lp__ 
-    ##  1.357356e-01  4.628608e+01  9.454549e+00  9.964080e+00 -4.636418e+04
+parM0<-summary(fitM0)$summary[,1]
+parM0
 
-``` r
-# plotting predictions
-ggplot(data, aes(Rg, NEE)) + geom_point() + geom_smooth() +
-    stat_function(fun = function(x) -(par[1]*par[2]*x/(par[1]*x+par[2]))+par[3], color="red")
-```
+ parM1
+     alpha[1]      alpha[2]       beta[1]       beta[2]      gamma[1] 
+ 1.331696e-01  2.308650e-01  4.647212e+01  4.892123e+01  1.147118e+01 
+     gamma[2]         sigma          lp__ 
+ 1.354232e+01  9.996811e+00 -3.466974e+04 
 
-    ## `geom_smooth()` using method = 'gam'
-
-![](Analyses_files/figure-markdown_github/basic%20plot-3.png) The basic model fits well the data. no convergence problems. Good estimates of model parameters. No chain covariance.
-
-Testing for a site effect on model parameters
-=============================================
-
-We first test on all parameters simultaneously. Let's see.
-
-``` r
-library(rstan)
-load(file="mod1.Rdata")
-traceplot(mod1, pars=c("alpha", "beta", "gamma", "sigma"), nrow=2)
-```
-
-![](Analyses_files/figure-markdown_github/all%20plot-1.png)
-
-``` r
-plot(mod1)
-```
-
-    ## ci_level: 0.8 (80% intervals)
-
-    ## outer_level: 0.95 (95% intervals)
-
-![](Analyses_files/figure-markdown_github/all%20plot-2.png)
-
-``` r
-# Model parameters
-par<-summary(mod1)$summary[,1]
-par
-```
-
-    ##      alpha[1]      alpha[2]       beta[1]       beta[2]      gamma[1] 
-    ##  1.111553e-01  1.617042e-01  4.666792e+01  4.669262e+01  9.636282e+00 
-    ##      gamma[2]         sigma          lp__ 
-    ##  8.987885e+00  9.855074e+00 -4.606304e+04
 
 From this model, it looks like
 
-**alphas are different, with a lower canopy light utilisation efficiency (0.10-0.12) at Guyaflux than at Nouraflux (0.15-0.17)**
+**alphas are different, with a lower canopy light utilisation efficiency (0.17-0.15) at Guyaflux than at Nouraflux (0.20-0.26)**
 
-**betas are not different, with the maximum NEE of the canopy at light saturation similar between the two sites (45-49)**
+**betas are not different, with the maximum NEE of the canopy at light saturation similar between the two sites (44.9-50.3)**
 
-**gammas are slightly different, with the average ecosystem respiration lower at Guyaflux (9.3-10.0) than at Nouraflux (8.6-9.4)**
+**gammas are slightly different, with the average ecosystem respiration lower at Guyaflux (10.4-12.6) than at Nouraflux (12.1-14.9)**
 
 Predictions
 ===========
