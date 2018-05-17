@@ -3,7 +3,7 @@ LE =𝐿 ∗𝑔𝑡𝑜𝑡 ∗𝑉𝑃𝐷/𝑃𝑎
 Where L is the latent heat of vaporization that depend on air temperature (L ~ -0.0019T - 2.2366T + 2499.5 at ambient pressure)
 And gtot is the total canopy conductance of the ecosystem (in mgH2O m-2 s-1)
 
-![](Analyses_files/figure-markdown_github/TraceplotM1_Le-VPD.png)
+![](Analyses_files/figure-markdown_github/TraceplotM1_LE-VPD.png)
 
 ``` r
 summary(fitM3)$summary[,1]
