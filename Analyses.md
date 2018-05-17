@@ -120,40 +120,45 @@ From this model, it looks like
 
 **gammas are slightly different, with the average ecosystem respiration lower at Guyaflux (9.3-10.0) than at Nouraflux (8.6-9.4)**
 
-**Running stan analysis with only daytime values
 
+Running the same analysis with only daytime values (Rg>5)
+=============================================
+
+``` r
 datStan<-list(N=11825, T=2, NEE=datDAY$NEE, Rg=datDAY$Rg, site=as.numeric(datDAY$site))
-
 fitM0 <- stan(file = 'mich0.stan', data = datStan, iter = 1000, chains = 1)
-
 fitM1 <- stan(file = 'mich1.stan', data = datStan, iter = 1000, chains = 1)
-
 traceplot(fitM0, pars=c("alpha", "beta", "gamma", "sigma"), nrow=2)
+```
 
 ![](Analyses_files/figure-markdown_github/TraceplotM0.png)
 
+``` r
 traceplot(fitM1, pars=c("alpha", "beta", "gamma", "sigma"), nrow=2)
+``` 
 
 ![](Analyses_files/figure-markdown_github/TraceplotM1.png)
 
-
+``` r
 parM1<-summary(fitM1)$summary[,1] 
 parM1
+``` 
 
 
+##   alpha[1]      alpha[2]       beta[1]       beta[2]      gamma[1] 
+## 1.331696e-01  2.308650e-01  4.647212e+01  4.892123e+01  1.147118e+01 
+##     gamma[2]         sigma          lp__ 
+## 1.354232e+01  9.996811e+00 -3.466974e+04 
 
-    alpha[1]      alpha[2]       beta[1]       beta[2]      gamma[1] 
- 1.331696e-01  2.308650e-01  4.647212e+01  4.892123e+01  1.147118e+01 
-     gamma[2]         sigma          lp__ 
- 1.354232e+01  9.996811e+00 -3.466974e+04 
 
-From this model, it looks like
+* From this model, it looks like:
 
-alphas are different, with a lower canopy light utilisation efficiency (0.17-0.15) at Guyaflux than at Nouraflux (0.20-0.26)
+(1) alphas are different, with a lower canopy light utilisation efficiency (0.13-0.17) at Guyaflux than at Nouraflux (0.24-0.32)
 
-betas are not different, with the maximum NEE of the canopy at light saturation similar between the two sites (44.9-50.3)
+(2) betas are slightly different, with the maximum NEE of the canopy at light saturation lower at Guyaflux (43.5-45.4) than at Nouraflux (46.1-49.5)
 
-gammas are slightly different, with the average ecosystem respiration lower at Guyaflux (10.4-12.6) than at Nouraflux (12.1-14.9)
+(3) gammas are slightly different, with the average ecosystem respiration lower at Guyaflux (9.3-12.1) than at Nouraflux (12.4-16.3)
+
 
 Predictions
 ===========
