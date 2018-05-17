@@ -142,14 +142,12 @@ traceplot(fitM1, pars=c("alpha", "beta", "gamma", "sigma"), nrow=2)
 ``` r
 parM1<-summary(fitM1)$summary[,1] 
 parM1
-``` 
-
-
-##   alpha[1]      alpha[2]       beta[1]       beta[2]      gamma[1] 
-## 1.331696e-01  2.308650e-01  4.647212e+01  4.892123e+01  1.147118e+01 
-##     gamma[2]         sigma          lp__ 
-## 1.354232e+01  9.996811e+00 -3.466974e+04 
-
+ 
+##     alpha[1]      alpha[2]       beta[1]       beta[2]      gamma[1] 
+## 1.334086e-01  2.308565e-01  4.647125e+01  4.884585e+01  1.149438e+01 
+##    gamma[2]         sigma          lp__ 
+## 1.350143e+01  9.996766e+00 -3.466933e+04 
+```
 
 * From this model, it looks like:
 
