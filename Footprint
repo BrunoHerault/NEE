@@ -1,0 +1,38 @@
+## Footprint estimation
+EddyPro_Gx<-readEddyPro("eddypro_GUYAFLUX_Li7000_AdvModeFINAL_full_output_2017.csv", na=-9999)
+EddyPro_Nx<-readEddyPro("eddypro_NOURAFLUX_AdvModeFINAL_full_output_2017.csv", na=-9999)
+
+ftp1.1=calculateFootprint(EddyPro_Nx,displacement=20.1,stability=1,fetch=200,grid=100,height=45,lowerDay=1,upperDay=91)
+ftp1.1=calculatePercentFootprint(ftp1.1,percent=80)
+ftp1_points=exportFootprintPoints(ftp1.1, 314054, 446995)
+
+ftp1_points2<-ftp1_points[is.na(ftp1_points$z)==F,]
+ftp1_points2<-ftp1_points2[ftp1_points2$z>=70,]
+
+ftp2.1=calculateFootprint(EddyPro_Gx,displacement=23.45,stability=1,fetch=1000,grid=200,height=55,lowerDay=1,upperDay=91)
+ftp2.1=calculatePercentFootprint(ftp2.1,percent=80)
+ftp2_points=exportFootprintPoints(ftp2.1, 286673, 583800)
+
+ftp2_points2<-ftp2_points[is.na(ftp2_points$z)==F,]
+ftp2_points2<-ftp2_points2[ftp2_points2$z>=79,]
+
+x1 <- ftp1_points2[,1]  ##tells R which columns is which
+y1 <- ftp1_points2[,2]
+dat1<-cbind(x1,y1)
+z1<-chull(x1,y1)       ##calculates the convex hull 
+
+coords1 <- dat1[c(z1, z1[1]), ]
+sp_poly1 <- SpatialPolygons(list(Polygons(list(Polygon(coords1)), ID=1)))
+sp_poly_df1 <- SpatialPolygonsDataFrame(sp_poly1, data=data.frame(ID=1))
+writeOGR(sp_poly_df1, "chull", layer="FootprintNx", driver="ESRI Shapefile")
+
+
+x2 <- ftp2_points2[,1]  ##tells R which columns is which
+y2 <- ftp2_points2[,2]
+dat2<-cbind(x2,y2)
+z2<-chull(x2,y2)       ##calculates the convex hull 
+
+coords2 <- dat2[c(z2, z2[1]), ]
+sp_poly2 <- SpatialPolygons(list(Polygons(list(Polygon(coords2)), ID=1)))
+sp_poly_df2 <- SpatialPolygonsDataFrame(sp_poly2, data=data.frame(ID=1))
+writeOGR(sp_poly_df2, "chull", layer="FootprintGx", driver="ESRI Shapefile")
